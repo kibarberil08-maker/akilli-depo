@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Akıllı Depo - Giriş</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-kutu {
+            background: white;
+            width: 380px;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border-top: 6px solid #1f3c88;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1f3c88;
+            margin: 0 0 8px 0;
+            font-size: 30px;
+        }
+
+        .alt-baslik {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+            input:focus {
+                outline: none;
+                border-color: #1f3c88;
+                box-shadow: 0 0 0 3px rgba(31, 60, 136, 0.1);
+            }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 8px;
+            background: #1f3c88;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+            button:hover {
+                background: #162d68;
+                transform: translateY(-1px);
+            }
+
+        .rfid-baslik {
+            text-align: center;
+            margin: 25px 0 10px;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .rfid-buton {
+            margin-top: 5px;
+            background: #16a34a;
+        }
+
+            .rfid-buton:hover {
+                background: #15803d;
+            }
+
+        #mesaj {
+            text-align: center;
+            margin-top: 18px;
+            color: #dc2626;
+            font-weight: bold;
+            min-height: 20px;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-kutu">
+
+        <div class="logo">📦</div>
+
+        <h1>Akıllı Depo</h1>
+
+        <div class="alt-baslik">
+            Stok ve Depo Yönetim Sistemi
+        </div>
+
+        <label>Kullanıcı Adı</label>
+        <input type="text" id="kullaniciAdi">
+
+        <label>Şifre</label>
+        <input type="password" id="sifre">
+
+        <button onclick="girisYap()">Giriş Yap</button>
+        <div class="rfid-baslik">
+            veya RFID kartınızla giriş yapın
+        </div>
+
+        <button class="rfid-buton" onclick="rfidGirisYap()">
+            📡 RFID ile Giriş
+        </button>
+
+        <div id="mesaj"></div>
+
+    </div>
+
+    <script>
+
+        async function girisYap() {
+
+            const kullaniciAdi =
+                document.getElementById("kullaniciAdi").value;
+
+            const sifre =
+                document.getElementById("sifre").value;
+
+            const cevap = await fetch("/api/kullanici/giris", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    kullaniciAdi: kullaniciAdi,
+                    sifre: sifre
+                })
+            });
+
+            if (cevap.ok) {
+
+                sessionStorage.setItem(
+                    "kullaniciAdi",
+                    kullaniciAdi
+                );
+
+                window.location.href = "index.html";
+
+            } else {
+
+                document.getElementById("mesaj").innerText =
+                    "Kullanıcı adı veya şifre hatalı.";
+            }
+        }
+
+
+        async function rfidGirisYap() {
+
+            const cevap = await fetch("/api/cihaz/rfid");
+
+            if (!cevap.ok) {
+
+                document.getElementById("mesaj").innerText =
+                    "RFID okunamadı.";
+
+                return;
+            }
+
+            const sonuc = await cevap.json();
+
+            if (!sonuc.uid) {
+
+                document.getElementById("mesaj").innerText =
+                    "Önce RFID kartınızı okutun.";
+
+                return;
+            }
+
+            const rfidCevap = await fetch("/api/kullanici/rfid", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    uid: sonuc.uid
+                })
+            });
+
+
+            if (rfidCevap.ok) {
+
+                const kullanici =
+                    await rfidCevap.json();
+
+                sessionStorage.setItem(
+                    "kullaniciAdi",
+                    kullanici.kullaniciAdi
+                );
+
+                window.location.href = "index.html";
+
+            } else {
+
+                document.getElementById("mesaj").innerText =
+                    "Bu RFID kart kayıtlı değil.";
+            }
+        }
+
+    </script>
+
+</body>
+</html>

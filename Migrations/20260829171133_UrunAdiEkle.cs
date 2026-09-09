@@ -1,0 +1,29 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace AkilliDepo.Migrations
+{
+    /// <inheritdoc />
+    public partial class UrunAdiEkle : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn<string>(
+                name: "UrunAdi",
+                table: "Hareketler",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "UrunAdi",
+                table: "Hareketler");
+        }
+    }
+}

@@ -1,0 +1,1152 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Akıllı Depo</title>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+            /* Üst başlık */
+            body > h1 {
+                background: #1f3c88;
+                color: white;
+                margin: 0;
+                padding: 28px 50px;
+                font-size: 30px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            }
+
+        h2 {
+            color: #1f3c88;
+            margin-top: 30px;
+        }
+
+        form {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            max-width: 700px;
+        }
+
+        label {
+            font-weight: bold;
+            display: inline-block;
+            min-width: 130px;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            margin-left: 5px;
+            min-width: 220px;
+        }
+
+            input:focus,
+            select:focus {
+                outline: none;
+                border-color: #1f3c88;
+            }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 9px 14px;
+            cursor: pointer;
+            margin: 3px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+            button:hover {
+                transform: translateY(-1px);
+                opacity: 0.9;
+            }
+
+        form button {
+            background: #1f3c88;
+            color: white;
+            padding: 11px 22px;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: #dbe1ea;
+            margin: 35px 0;
+        }
+
+        /* Tablolar */
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 1100px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        th {
+            background: #1f3c88;
+            color: white;
+            padding: 13px;
+            border: none;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+            border-left: none;
+            border-right: none;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* Durum */
+        .kritik {
+            color: #dc2626;
+            font-weight: bold;
+            background: #fee2e2;
+        }
+
+        .normal {
+            color: #15803d;
+            font-weight: bold;
+            background: #dcfce7;
+        }
+
+        /* Giriş / Çıkış */
+        .giris {
+            background: #16a34a;
+            color: white;
+        }
+
+        .cikis {
+            background: #dc2626;
+            color: white;
+        }
+
+        /* Diğer butonlar */
+        button[onclick^="urunSil"] {
+            background: #6b7280;
+            color: white;
+        }
+
+        button[onclick^="urunVer"] {
+            background: #f59e0b;
+            color: white;
+        }
+
+        /* Barkod bölümü */
+        #qr-reader {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            margin-top: 15px;
+        }
+
+        #qrSonuc {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 600px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        /* Grafik */
+        #stokGrafigi {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            max-width: 950px;
+        }
+
+        /* Genel sayfa boşlukları */
+        body {
+            padding-bottom: 50px;
+        }
+
+            body > h2,
+            body > form,
+            body > table,
+            body > div,
+            body > p,
+            body > canvas {
+                margin-left: 40px;
+                margin-right: 40px;
+            }
+        /* Dashboard */
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 25px 40px 35px 40px;
+            max-width: 1100px;
+        }
+
+        .dashboard-kart {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .dashboard-ikon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-baslik {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-sayi {
+            font-size: 30px;
+            font-weight: bold;
+            color: #1f3c88;
+        }
+
+        .dashboard-kritik .dashboard-sayi {
+            color: #dc2626;
+        }
+
+        .dashboard-normal .dashboard-sayi {
+            color: #15803d;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Kritik ürünler */
+
+        .kritik-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            margin: 0 40px 35px 40px;
+            max-width: 1100px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+            .kritik-panel h2 {
+                margin-top: 0;
+                color: #dc2626;
+            }
+
+        .kritik-liste {
+            display: grid;
+            gap: 10px;
+        }
+
+        .kritik-urun {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: #fee2e2;
+            border-radius: 8px;
+            border-left: 5px solid #dc2626;
+        }
+
+            .kritik-urun strong {
+                color: #991b1b;
+            }
+
+        .kritik-bilgi {
+            color: #7f1d1d;
+            font-weight: bold;
+        }
+
+        .kritik-yok {
+            padding: 15px;
+            background: #dcfce7;
+            color: #15803d;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        /* Ürün arama ve filtreleme */
+
+        .urun-filtre {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 0 40px 15px 40px;
+            max-width: 1100px;
+        }
+
+            .urun-filtre input,
+            .urun-filtre select {
+                margin-left: 0;
+                min-width: 200px;
+            }
+
+            .urun-filtre input {
+                flex: 1;
+            }
+        @media (max-width: 900px) {
+            body {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 850px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Akıllı Depo - Stok Takip</h1>
+
+    <!-- DASHBOARD -->
+
+    <div class="dashboard">
+
+        <div class="dashboard-kart">
+            <div class="dashboard-ikon">📦</div>
+            <div class="dashboard-baslik">Toplam Ürün</div>
+            <div class="dashboard-sayi" id="toplamUrun">0</div>
+        </div>
+
+        <div class="dashboard-kart">
+            <div class="dashboard-ikon">📊</div>
+            <div class="dashboard-baslik">Toplam Stok</div>
+            <div class="dashboard-sayi" id="toplamStok">0</div>
+        </div>
+
+        <div class="dashboard-kart dashboard-normal">
+            <div class="dashboard-ikon">🟢</div>
+            <div class="dashboard-baslik">Normal Stok</div>
+            <div class="dashboard-sayi" id="normalUrun">0</div>
+        </div>
+
+        <div class="dashboard-kart dashboard-kritik">
+            <div class="dashboard-ikon">🔴</div>
+            <div class="dashboard-baslik">Kritik Stok</div>
+            <div class="dashboard-sayi" id="kritikUrun">0</div>
+        </div>
+
+    </div>
+
+    <!-- KRİTİK ÜRÜNLER -->
+
+    <div class="kritik-panel">
+
+        <h2>⚠️ Kritik Stoklar</h2>
+
+        <div id="kritikUrunler" class="kritik-liste">
+        </div>
+
+    </div>
+
+    <!-- YENİ ÜRÜN EKLEME -->
+    <h2>Yeni Ürün Ekle</h2>
+
+    <form id="urunFormu">
+
+        <label>Ürün Adı:</label>
+        <input type="text" id="ad" required>
+
+        <br><br>
+
+        <label>Barkod:</label>
+        <input type="text" id="barkod">
+
+        <br><br>
+
+        <label>Raf No:</label>
+        <select id="rafNo" required>
+            <option value="">Raf seçiniz</option>
+            <option value="A1">A1</option>
+            <option value="A2">A2</option>
+            <option value="A3">A3</option>
+            <option value="B1">B1</option>
+            <option value="B2">B2</option>
+            <option value="B3">B3</option>
+        </select>
+
+        <br><br>
+
+        <label>Başlangıç Adedi:</label>
+        <input type="number" id="adet" value="0" min="0" required>
+
+        <br><br>
+
+        <label>Minimum Adet:</label>
+        <input type="number" id="minAdet" value="5" min="0" required>
+
+        <br><br>
+
+        <button type="submit">Ürün Ekle</button>
+
+    </form>
+
+
+    <hr>
+
+
+    <!-- ÜRÜNLER -->
+    <h2>Ürünler</h2>
+    <!-- ÜRÜN ARAMA VE FİLTRELEME -->
+
+    <div class="urun-filtre">
+
+        <input type="text"
+               id="urunArama"
+               placeholder="🔍 Ürün adı veya barkod ara..."
+               oninput="urunleriFiltrele()">
+
+        <select id="durumFiltre" onchange="urunleriFiltrele()">
+            <option value="tum">Tüm Durumlar</option>
+            <option value="normal">🟢 Normal</option>
+            <option value="kritik">🔴 Kritik</option>
+        </select>
+
+        <select id="rafFiltre" onchange="urunleriFiltrele()">
+            <option value="tum">Tüm Raflar</option>
+            <option value="A1">A1</option>
+            <option value="A2">A2</option>
+            <option value="A3">A3</option>
+            <option value="B1">B1</option>
+            <option value="B2">B2</option>
+            <option value="B3">B3</option>
+        </select>
+
+    </div>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Ürün Adı</th>
+                <th>Raf</th>
+                <th>Adet</th>
+                <th>Minimum Adet</th>
+                <th>Durum</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+
+        <tbody id="urunTablosu">
+        </tbody>
+
+    </table>
+
+    <h2>QR / Barkod Okut</h2>
+
+    <div id="qr-reader" style="width: 400px;"></div>
+
+    <button onclick="qrBaslat()">
+        📷 QR Tara
+    </button>
+
+    <p id="qrSonuc"></p>
+
+    <br><br>
+    <h2>Son 7 Gün Stok Hareketleri</h2>
+    <canvas id="stokGrafigi"></canvas>
+    <br><br>
+    <h2>Hareket Geçmişi</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Ürün Adı</th>
+                <th>İşlem</th>
+                <th>Miktar</th>
+                <th>Kullanıcı</th>
+                <th>Tarih</th>
+            </tr>
+        </thead>
+
+        <tbody id="hareketTablosu">
+        </tbody>
+
+    </table>
+
+
+    <script>
+
+        if (!sessionStorage.getItem("kullaniciAdi")) {
+            window.location.href = "/login.html";
+        }
+
+        // Ürünleri API'den getirir
+        async function urunleriGetir() {
+
+            const cevap = await fetch('/api/urunler');
+
+            const urunler = await cevap.json();
+
+            const tablo = document.getElementById('urunTablosu');
+
+            tablo.innerHTML = '';
+
+            // Dashboard bilgilerini hesapla
+
+            let toplamStok = 0;
+            let kritikUrun = 0;
+            let normalUrun = 0;
+
+            urunler.forEach(urun => {
+
+                toplamStok += urun.adet;
+
+                if (urun.adet < urun.minAdet) {
+                    kritikUrun++;
+                } else {
+                    normalUrun++;
+                }
+
+            });
+
+            // Dashboard'u güncelle
+
+            document.getElementById('toplamUrun').innerText = urunler.length;
+            document.getElementById('toplamStok').innerText = toplamStok;
+            document.getElementById('kritikUrun').innerText = kritikUrun;
+            document.getElementById('normalUrun').innerText = normalUrun;
+            // Kritik ürünler listesini oluştur
+
+            const kritikListe = document.getElementById('kritikUrunler');
+
+            kritikListe.innerHTML = '';
+
+            const kritikUrunler = urunler.filter(
+                urun => urun.adet < urun.minAdet
+            );
+
+            if (kritikUrunler.length === 0) {
+
+                kritikListe.innerHTML = `
+                <div class="kritik-yok">
+                    ✅ Tüm ürünlerin stok durumu normal.
+                </div>
+            `;
+
+            } else {
+
+                kritikUrunler.forEach(urun => {
+
+                    const kart = document.createElement('div');
+
+                    kart.className = 'kritik-urun';
+
+                    kart.innerHTML = `
+                    <div>
+                        <strong>${urun.ad}</strong>
+                        <div>📍 Raf: ${urun.rafNo}</div>
+                    </div>
+
+                    <div class="kritik-bilgi">
+                        ${urun.adet} / ${urun.minAdet} adet
+                    </div>
+                `;
+
+                    kritikListe.appendChild(kart);
+                });
+            }
+
+
+            urunler.forEach(urun => {
+
+                const kritik = urun.adet < urun.minAdet;
+
+                const satir = document.createElement('tr');
+
+
+                satir.innerHTML = `
+                                                <td>${urun.ad}</td>
+
+                                                <td>${urun.rafNo}</td>
+
+                                                <td>${urun.adet}</td>
+
+                                                <td>${urun.minAdet}</td>
+
+                                                <td class="${kritik ? 'kritik' : 'normal'}">
+                                                    ${kritik ? 'KRİTİK' : 'Normal'}
+                                                </td>
+
+                                                <td>
+                                                    <button class="giris"
+                                                            onclick="hareketYap(${urun.id}, 'giris')">
+                                                        + Giriş
+                                                    </button>
+
+                                                    <button class="cikis"
+                                                            onclick="hareketYap(${urun.id}, 'cikis')">
+                                                        − Çıkış
+                                                    </button>
+                                                    <button onclick="urunSil(${urun.id})">
+                                                     Sil
+                                                      </button>
+                                                      <button onclick="urunVer(${urun.id})">
+                                                      📦 Ürünü Ver
+                                                      </button>
+                                                </td>
+                                            `;
+
+
+                tablo.appendChild(satir);
+            });
+        }
+        async function urunSil(urunId) {
+
+            const onay = confirm('Bu ürünü silmek istediğinize emin misiniz?');
+
+            if (!onay) {
+                return;
+            }
+
+            const cevap = await fetch(`/api/urunler/${urunId}`, {
+                method: 'DELETE'
+            });
+
+            if (cevap.ok) {
+
+                alert('Ürün başarıyla silindi.');
+
+                urunleriGetir();
+                hareketleriGetir();
+
+            } else {
+
+                const hata = await cevap.text();
+
+                alert('Ürün silinirken hata oluştu:\n' + hata);
+            }
+        }
+
+        // Giriş / Çıkış işlemi
+        async function hareketYap(urunId, tip) {
+
+            const miktar = prompt(
+                tip === 'giris'
+                    ? 'Kaç adet giriş yapılacak?'
+                    : 'Kaç adet çıkış yapılacak?'
+            );
+
+
+            if (miktar === null) {
+                return;
+            }
+
+
+            const sayi = Number(miktar);
+
+
+            if (sayi <= 0 || !Number.isInteger(sayi)) {
+
+                alert('Lütfen 0’dan büyük tam sayı girin.');
+
+                return;
+            }
+
+
+            const cevap = await fetch(`/api/urunler/${urunId}/hareket`, {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    tip: tip,
+                    miktar: sayi,
+                    kullaniciAdi: sessionStorage.getItem("kullaniciAdi")
+                })
+            });
+
+
+            if (cevap.ok) {
+
+                const sonuc = await cevap.json();
+
+                alert(
+                    'İşlem başarılı!\nYeni stok: ' + sonuc.adet
+                );
+
+                urunleriGetir();
+                hareketleriGetir();
+
+            } else {
+
+                const hata = await cevap.text();
+
+                alert('İşlem sırasında hata oluştu:\n' + hata);
+            }
+        }
+        async function urunVer(urunId) {
+
+            const onay = confirm(
+                "Bu ürünü vermek ve stoktan 1 adet düşmek istiyor musunuz?"
+            );
+
+            if (!onay) {
+                return;
+            }
+
+            const cevap = await fetch(`/api/urunler/${urunId}/urunver`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    kullaniciAdi: sessionStorage.getItem("kullaniciAdi")
+                })
+            });
+
+
+            if (cevap.ok) {
+
+                const sonuc = await cevap.json();
+
+                alert(
+                    'Ürün verildi!\nYeni stok: ' + sonuc.adet
+                );
+
+                urunleriGetir();
+                hareketleriGetir();
+
+            } else {
+
+                const hata = await cevap.text();
+
+                alert(
+                    'Ürün verilirken hata oluştu:\n' + hata
+                );
+            }
+        }
+
+
+        // Yeni ürün ekleme
+        document.getElementById('urunFormu').addEventListener(
+            'submit',
+            async function (e) {
+
+                e.preventDefault();
+
+
+                const yeniUrun = {
+
+                    ad: document.getElementById('ad').value,
+
+                    barkod: document.getElementById(`barkod`).value,
+
+                    rafNo: document.getElementById('rafNo').value,
+
+                    adet: Number(
+                        document.getElementById('adet').value
+                    ),
+
+                    minAdet: Number(
+                        document.getElementById('minAdet').value
+                    )
+                };
+
+
+                const cevap = await fetch('/api/urunler', {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify(yeniUrun)
+                });
+
+
+                if (cevap.ok) {
+
+                    alert('Ürün başarıyla eklendi!');
+
+                    document.getElementById('urunFormu').reset();
+
+                    urunleriGetir();
+
+                } else {
+
+                    alert('Ürün eklenirken hata oluştu.');
+                }
+            }
+        );
+        async function hareketleriGetir() {
+
+            const urunCevap = await fetch('/api/urunler');
+            const urunler = await urunCevap.json();
+
+            const hareketCevap = await fetch('/api/urunler/hareketler');
+            const hareketler = await hareketCevap.json();
+
+            const tablo = document.getElementById('hareketTablosu');
+
+            tablo.innerHTML = '';
+
+            hareketler.forEach(hareket => {
+
+                const urun = urunler.find(u => u.id === hareket.urunId);
+
+                const satir = document.createElement('tr');
+
+                satir.innerHTML = `
+                                <td>${urun ? urun.ad : 'Silinmiş ürün'}</td>
+                                <td>${hareket.tip}</td>
+                                <td>${hareket.miktar}</td>
+                                <td>${hareket.kullaniciAdi}</td>
+                                <td>${new Date(hareket.tarih).toLocaleString('tr-TR')}</td>
+                            `;
+
+                tablo.appendChild(satir);
+            });
+        }
+
+        async function grafikGetir() {
+
+            const cevap = await fetch('/api/urunler/hareketler');
+
+            const hareketler = await cevap.json();
+
+            const sonYediGun = {};
+
+            const bugun = new Date();
+
+            for (let i = 6; i >= 0; i--) {
+
+                const tarih = new Date(bugun);
+
+                tarih.setDate(bugun.getDate() - i);
+
+                const anahtar = tarih.toLocaleDateString('tr-TR');
+
+                sonYediGun[anahtar] = {
+                    giris: 0,
+                    cikis: 0
+                };
+            }
+
+            hareketler.forEach(hareket => {
+
+                const tarih = new Date(hareket.tarih);
+
+                const anahtar = tarih.toLocaleDateString('tr-TR');
+
+                if (sonYediGun[anahtar]) {
+
+                    if (hareket.tip === 'giris') {
+                        sonYediGun[anahtar].giris += hareket.miktar;
+                    }
+
+                    if (hareket.tip === 'cikis') {
+                        sonYediGun[anahtar].cikis += hareket.miktar;
+                    }
+                }
+            });
+
+            const etiketler = Object.keys(sonYediGun);
+
+            const canvas = document.getElementById('stokGrafigi');
+
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = 900;
+            canvas.height = 400;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const maksimum = Math.max(
+                ...etiketler.map(tarih =>
+                    Math.max(
+                        sonYediGun[tarih].giris,
+                        sonYediGun[tarih].cikis
+                    )
+                ),
+                1
+            );
+
+            const grafikAlt = 330;
+            const grafikUst = 40;
+            const grafikYukseklik = grafikAlt - grafikUst;
+
+            const sutunGenisligi = 40;
+            const gunAraligi = 120;
+
+            etiketler.forEach((tarih, index) => {
+
+                const x = 60 + index * gunAraligi;
+
+                const giris = sonYediGun[tarih].giris;
+                const cikis = sonYediGun[tarih].cikis;
+
+                const girisYukseklik =
+                    (giris / maksimum) * grafikYukseklik;
+
+                const cikisYukseklik =
+                    (cikis / maksimum) * grafikYukseklik;
+
+                ctx.fillStyle = "green";
+
+                ctx.fillRect(
+                    x,
+                    grafikAlt - girisYukseklik,
+                    sutunGenisligi,
+                    girisYukseklik
+                );
+
+                ctx.fillStyle = "red";
+
+                ctx.fillRect(
+                    x + 45,
+                    grafikAlt - cikisYukseklik,
+                    sutunGenisligi,
+                    cikisYukseklik
+                );
+
+                ctx.fillStyle = "black";
+
+                ctx.font = "14px Arial";
+
+                ctx.fillText(
+                    tarih,
+                    x,
+                    360
+                );
+
+                ctx.fillText(
+                    giris,
+                    x + 10,
+                    grafikAlt - girisYukseklik - 5
+                );
+
+                ctx.fillText(
+                    cikis,
+                    x + 55,
+                    grafikAlt - cikisYukseklik - 5
+                );
+            });
+
+            ctx.fillStyle = "green";
+            ctx.fillRect(700, 30, 20, 20);
+
+            ctx.fillStyle = "black";
+            ctx.fillText("Giriş", 730, 46);
+
+            ctx.fillStyle = "red";
+            ctx.fillRect(780, 30, 20, 20);
+
+            ctx.fillStyle = "black";
+            ctx.fillText("Çıkış", 810, 46);
+        }
+
+        async function barkodGonder(barkod) {
+
+            const secim = prompt(
+                "İşlem seçiniz:\n\n1 - Ekle\n2 - Çıkar"
+            );
+
+            if (secim === null) {
+                return;
+            }
+
+            let tip;
+
+            if (secim === "1") {
+                tip = "giris";
+            }
+            else if (secim === "2") {
+                tip = "cikis";
+            }
+            else {
+                alert("Geçersiz seçim. Lütfen 1 veya 2 girin.");
+                return;
+            }
+
+            const miktar = prompt(
+                tip === "giris"
+                    ? "Kaç adet giriş yapılacak?"
+                    : "Kaç adet çıkış yapılacak?"
+            );
+
+            if (miktar === null) {
+                return;
+            }
+
+            const sayi = Number(miktar);
+
+            if (sayi <= 0 || !Number.isInteger(sayi)) {
+                alert("Lütfen 0'dan büyük tam sayı girin.");
+                return;
+            }
+
+            const cevap = await fetch('/api/urunler/barkod', {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    barkod: barkod,
+                    tip: tip,
+                    miktar: sayi,
+                    kullaniciAdi: sessionStorage.getItem("kullaniciAdi")
+                })
+            });
+
+            if (cevap.ok) {
+
+                const sonuc = await cevap.json();
+
+                document.getElementById('qrSonuc').innerText =
+                    (tip === "giris"
+                        ? "Giriş yapıldı: "
+                        : "Çıkış yapıldı: ")
+                    + sonuc.urun
+                    + " | Yeni stok: "
+                    + sonuc.adet;
+
+                urunleriGetir();
+                hareketleriGetir();
+                grafikGetir();
+
+            }
+            else {
+
+                const hata = await cevap.text();
+
+                document.getElementById('qrSonuc').innerText =
+                    'Hata: ' + hata;
+            }
+        }
+        function qrBaslat() {
+
+            const qrReader = new Html5Qrcode("qr-reader");
+
+            qrReader.start(
+                { facingMode: "environment" },
+
+                {
+                    fps: 10,
+                    qrbox: 250
+                },
+
+                (decodedText) => {
+
+                    document.getElementById("qrSonuc").innerText =
+                        "Okunan barkod: " + decodedText;
+
+                    qrReader.stop();
+
+                    barkodGonder(decodedText);
+                },
+
+                (errorMessage) => {
+                    // QR bulunamadığında burada bir şey yapmıyoruz.
+                }
+            )
+                .catch((err) => {
+
+                    document.getElementById("qrSonuc").innerText =
+                        "Kamera açılamadı: " + err;
+                });
+        }
+
+
+        grafikGetir();
+
+        urunleriGetir();
+        hareketleriGetir();
+        function urunleriFiltrele() {
+
+            const arama = document
+                .getElementById('urunArama')
+                .value
+                .toLowerCase();
+
+            const durum = document
+                .getElementById('durumFiltre')
+                .value;
+
+            const raf = document
+                .getElementById('rafFiltre')
+                .value;
+
+            const satirlar = document.querySelectorAll('#urunTablosu tr');
+
+            satirlar.forEach(satir => {
+
+                const hucreler = satir.querySelectorAll('td');
+
+                if (hucreler.length === 0) {
+                    return;
+                }
+
+                const urunAdi = hucreler[0].innerText.toLowerCase();
+                const rafNo = hucreler[1].innerText;
+                const durumMetni = hucreler[4].innerText.toLowerCase();
+
+                const aramaUygun =
+                    urunAdi.includes(arama);
+
+                const rafUygun =
+                    raf === 'tum' || rafNo === raf;
+
+                const durumUygun =
+                    durum === 'tum' ||
+                    (durum === 'kritik' && durumMetni.includes('kritik')) ||
+                    (durum === 'normal' && durumMetni.includes('normal'));
+
+                if (aramaUygun && rafUygun && durumUygun) {
+                    satir.style.display = '';
+                } else {
+                    satir.style.display = 'none';
+                }
+
+            });
+        }
+
+    </script>
+
+</body>
+</html>
